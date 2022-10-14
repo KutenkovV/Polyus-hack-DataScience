@@ -22,6 +22,8 @@ db = SQLAlchemy(app)
 
 # NOTHING BELOW THIS LINE NEEDS TO CHANGE
 # this route will test the database connection and nothing more
+
+
 @app.route('/')
 def testdb():
     try:
@@ -32,6 +34,15 @@ def testdb():
         error_text = "<p>The error:<br>" + str(e) + "</p>"
         hed = '<h1>Something is broken.</h1>'
         return hed + error_text
+
+
+@app.route('/weather/<zip>')
+def result(zip):
+    # get the json file from the OpenWeather API
+    resp = {'zip': zip}
+
+    return resp
+
 
 if __name__ == '__main__':
     app.run(debug=True)
