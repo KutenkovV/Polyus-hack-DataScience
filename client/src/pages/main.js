@@ -1,5 +1,6 @@
 import Video from "../components/video";
 import Analysis from "../components/analysis";
+import MaxSize from "../charts/MaxSize";
 
 function name() {
   document.title = "Главная страница";
@@ -12,7 +13,9 @@ function name() {
         </div>
         <div>
           <Analysis />
+          {/* <MaxSize /> */}
         </div>
+        
       </div>
     </>
   );
