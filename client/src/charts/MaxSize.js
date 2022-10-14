@@ -1,58 +1,37 @@
 import {
     Chart,
-    ChartTitle,
-    ChartLegend,
     ChartSeries,
     ChartSeriesItem,
-    ChartSeriesLabels,
+    ChartValueAxis,
+    ChartValueAxisItem,
+    ChartTitle,
+    ChartLegend,
   } from "@progress/kendo-react-charts";
   import { COLORS } from "./colors";
   
-  // Graph data
-  const applicationsStatusThisMonth = [
+  export const series = [
     {
-   status: "Accepted",
-   value: 14,
-   color: COLORS.accepted,
-    },
-    {
-   status: "Interviewing",
-   value: 14,
-   color: COLORS.interviewing,
-    },
-    {
-   status: "Rejected",
-   value: 40,
-   color: COLORS.rejected,
-    },
-    {
-   status: "Pending",
-   value: 32,
-   color: COLORS.pending,
-    },
+   data: [120, 233, 108, 376, 299]
+    }
   ];
-  
-  // Show category label for each item in the donut graph
-  const labelContent = e => e.category;
   
   const MaxSize = props => {
     return (
-   <Chart>
-   <ChartTitle text="Applications status - this month" />
-   <ChartLegend visible={false} />
+   <Chart pannable zoomable style={{ height: 350 }}>
+   <ChartTitle text="Визуализация изменения максимального размера частиц" />
+   <ChartLegend position="top" orientation="horizontal" />
+   <ChartValueAxis>
+   <ChartValueAxisItem title={{ text: "ММ" }} min={100} max={400} />
+   </ChartValueAxis>
    <ChartSeries>
+   {series.map((item, idx) => (
    <ChartSeriesItem
-   type="donut"
-   data={applicationsStatusThisMonth}
-   categoryField="status"
-   field="value"
-   >
-   <ChartSeriesLabels
-   color="#fff"
-   background="none"
-   content={labelContent}
+   key={idx}
+   type="line"
+   tooltip={{ visible: true }}
+   data={item.data}
    />
-   </ChartSeriesItem>
+   ))}
    </ChartSeries>
    </Chart>
     );
