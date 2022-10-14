@@ -1,24 +1,20 @@
-/* table td,
-.table th {
-    padding: 10px;
-    padding-left: 25px;
-    font-size: 1.2em;
-    border-bottom: 1px solid gainsboro;
-    text-align: start;
-}
-
-table th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: center;
-    color: #000000;
-    line-height: 1.5;
-} */
-
 .label {
     font-size: 25px;
 }
 
+td {
+    vertical-align: middle;
+}
+
+table tr td:last-child {
+    padding-left: 30px;
+}
+
+.table {
+    margin-bottom: 0%;
+}
+
+/* да я умный, очень умный (нет конечно, какой да*н так делает емае */
 .box_1 {
     background-color: #FB3E3E;
     width: 15px;

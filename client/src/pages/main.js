@@ -6,20 +6,20 @@ import Circular from "./../charts/Circular";
 import MaxSize from "./../charts/MaxSize";
 
 function name() {
-  document.title = "Главная страница";
+  document.title = "Страница оператора";
 
   return (
     <>
-      <div className="m-3">
-        <div className="d-flex">
+      <div className="m-3 d-flex">
+        <div className="col-5">
           <Video />
-          <Analysis />
         </div>
-        <div className="d-flex">
-          <div>
+        <div className="d-flex col-7">
+          <div className="ms-3 col">
+            <Analysis />
             <MaxSize />
           </div>
-          <div>
+          <div className="col">
             <Circular />
           </div>
         </div>
