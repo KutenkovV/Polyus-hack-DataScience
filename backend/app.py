@@ -1,48 +1,116 @@
-"""
-    test a SQLite database connection locally
-    assumes database file is in same location
-    as this .py file
-"""
-
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import text
-
+from flask import Flask, render_template, request
+import sqlite3 as sql
 app = Flask(__name__)
-
-# change to name of your database; add path if necessary
-db_name = 'sockmarket.db'
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
-# this variable, db, will be used for all SQLAlchemy commands
-db = SQLAlchemy(app)
-
-# NOTHING BELOW THIS LINE NEEDS TO CHANGE
-# this route will test the database connection and nothing more
 
 
 @app.route('/')
-def testdb():
-    try:
-        db.session.query(text('1')).from_statement(text('SELECT 1')).all()
-        return '<h1>It works.</h1>'
-    except Exception as e:
-        # e holds description of the error
-        error_text = "<p>The error:<br>" + str(e) + "</p>"
-        hed = '<h1>Something is broken.</h1>'
-        return hed + error_text
+def home():
+    return render_template('home.html')
 
 
-@app.route('/weather/<zip>')
-def result(zip):
-    # get the json file from the OpenWeather API
-    resp = {'zip': zip}
-
-    return resp
+@app.route('/enternew')
+def new_student():
+    return render_template('student.html')
 
 
+@app.route('/addrec', methods=['POST', 'GET'])
+def addrec():
+    if request.method == 'POST':
+        try:
+            nm = request.form['nm']
+            addr = request.form['add']
+            city = request.form['city']
+            pin = request.form['pin']
+
+            with sql.connect("database.db") as con:
+                cur = con.cursor()
+
+                cur.execute(
+                    "INSERT INTO students(name, addr, city, pin) VALUES(?, ?, ?, ?)", (nm, addr, city, pin))
+
+                con.commit()
+                msg = "Record successfully added"
+        except:
+            con.rollback()
+            msg = "error in insert operation"
+
+        finally:
+            return render_template("result.html", msg=msg)
+            con.close()
+
+
+@app.route('/list')
+def list():
+    con = sql.connect("database.db")
+    con.row_factory = sql.Row
+
+    cur = con.cursor()
+    cur.execute("select * from students")
+
+    rows = cur.fetchall()
+    return render_template("list.html", rows=rows)
+
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def home():
+    return 'home.html'
+
+
+@app.route('/addrec', methods=['POST', 'GET'])
+def addrec():
+    if request.method == 'POST':
+        msg = ''
+        print('nm')
+
+        try:
+            request_data = request.get_json()
+            nm = request_data['nm']
+            print(nm)
+
+            addr = request_data['add']
+            city = request_data['city']
+            pin = request_data['pin']
+
+            with sql.connect("database.db") as con:
+                cur = con.cursor()
+                print(nm)
+                cur.execute(
+                    "INSERT INTO students(name, addr, city, pin)  VALUES(?, ?, ?, ?)", (nm, addr, city, pin))
+
+                con.commit()
+                msg = "Record successfully added"
+        except:
+            con.rollback()
+            msg = "error in insert operation"
+
+        finally:
+            return {'msg': msg}
+            con.close()
+    if request.method == 'GET':
+        return 'get'
+
+
+@app.route('/list')
+def list():
+    con = sql.connect("database.db")
+    con.row_factory = sql.Row
+
+    cursor = con.cursor().execute("select * from students")
+    columns = [column[0] for column in cursor.description]
+    print(columns)
+
+    results = []
+    for row in cursor.fetchall():
+        results.append(dict(zip(columns, row)))
+
+    print(results)
+    return {'rows': results}
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
 if __name__ == '__main__':
     app.run(debug=True)
