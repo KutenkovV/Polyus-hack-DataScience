@@ -10,16 +10,19 @@ function name() {
 
   return (
     <>
-      <div className="d-flex">
-        <div>
+      <div className="m-3">
+        <div className="d-flex">
           <Video />
-          <MaxSize />
-        </div>
-        <div>
           <Analysis />
-          <Circular />
         </div>
-        
+        <div className="d-flex">
+          <div>
+            <MaxSize />
+          </div>
+          <div>
+            <Circular />
+          </div>
+        </div>
       </div>
     </>
   );

@@ -1,10 +1,11 @@
 import "../components/analysis.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Analysis = () => {
   return (
-    <>
-      <p>Гранулометрический состав руды</p>
-      <table>
+    <div className="ms-3">
+      <p className="label">Гранулометрический состав руды</p>
+      <table class="table">
         <thead>
           <tr>
             <th>№</th>
@@ -72,7 +73,7 @@ const Analysis = () => {
           </tr>
         </tbody>
       </table>
-    </>
+    </div>
   );
 };
 
