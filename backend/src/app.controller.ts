@@ -14,7 +14,6 @@ export class AppController {
 
   @Get('/video-example')
   getFile(@Res({ passthrough: true }) res): StreamableFile {
-    console.log('ASPD:OAPHNS:FOUJBGALHUJ');
     const file = createReadStream(join(process.cwd(), 'videos/video.mp4'));
     res.set({
       'Content-Type': 'video/mp4',
