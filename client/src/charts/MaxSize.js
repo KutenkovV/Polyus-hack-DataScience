@@ -1,46 +1,61 @@
-import React from "react";
-import { Line } from "react-chartjs-2";
-
-const MaxSize = () => {
-  const lineChartData = {
-    labels: ["October", "November", "December"],
-    datasets: [
-      {
-        data: [8137119, 9431691, 10266674],
-        label: "Infected",
-        borderColor: "#3333ff",
-        fill: true,
-        lineTension: 0.5
-      },
-      {
-        data: [1216410, 1371390, 1477380],
-        label: "Deaths",
-        borderColor: "#ff3333",
-        backgroundColor: "rgba(255, 0, 0, 0.5)",
-        fill: true,
-        lineTension: 0.5
-      }
-    ]
+import {
+    Chart,
+    ChartTitle,
+    ChartLegend,
+    ChartSeries,
+    ChartSeriesItem,
+    ChartSeriesLabels,
+  } from "@progress/kendo-react-charts";
+  import { COLORS } from "./colors";
+  
+  // Graph data
+  const applicationsStatusThisMonth = [
+    {
+   status: "Accepted",
+   value: 14,
+   color: COLORS.accepted,
+    },
+    {
+   status: "Interviewing",
+   value: 14,
+   color: COLORS.interviewing,
+    },
+    {
+   status: "Rejected",
+   value: 40,
+   color: COLORS.rejected,
+    },
+    {
+   status: "Pending",
+   value: 32,
+   color: COLORS.pending,
+    },
+  ];
+  
+  // Show category label for each item in the donut graph
+  const labelContent = e => e.category;
+  
+  const MaxSize = props => {
+    return (
+   <Chart>
+   <ChartTitle text="Applications status - this month" />
+   <ChartLegend visible={false} />
+   <ChartSeries>
+   <ChartSeriesItem
+   type="donut"
+   data={applicationsStatusThisMonth}
+   categoryField="status"
+   field="value"
+   >
+   <ChartSeriesLabels
+   color="#fff"
+   background="none"
+   content={labelContent}
+   />
+   </ChartSeriesItem>
+   </ChartSeries>
+   </Chart>
+    );
   };
-
-  return (
-    <Line
-      type="line"
-      width={160}
-      height={60}
-      options={{
-        title: {
-          display: true,
-          text: "COVID-19 Cases of Last 6 Months",
-          fontSize: 20
-        },
-        legend: {
-          display: true, //Is the legend shown?
-          position: "top" //Position of the legend.
-        }
-      }}
-      data={lineChartData}
-    />
-  );
-};
-export default MaxSize;
+  
+  export default MaxSize;
