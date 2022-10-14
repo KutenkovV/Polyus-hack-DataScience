@@ -1,3 +1,4 @@
+import "../pages/main.css"
 import Video from "../components/video";
 import Analysis from "../components/analysis";
 
@@ -5,21 +6,19 @@ import "@progress/kendo-theme-material/dist/all.css";
 import Circular from "./../charts/Circular";
 import MaxSize from "./../charts/MaxSize";
 
-function name() {
-  document.title = "Страница оператора";
+function main() {
 
   return (
     <>
-      <div className="m-3 d-flex">
-        <div className="col-5">
+      <div className="m-1 d-flex">
+        <div className="col-6 content_info">
           <Video />
+          <MaxSize />
         </div>
-        <div className="d-flex col-7">
-          <div className="ms-3 col">
+        
+        <div className="d-flex ms-3 col content_info">
+          <div className="d-block col">
             <Analysis />
-            <MaxSize />
-          </div>
-          <div className="col">
             <Circular />
           </div>
         </div>
@@ -28,4 +27,4 @@ function name() {
   );
 }
 
-export default name;
+export default main;

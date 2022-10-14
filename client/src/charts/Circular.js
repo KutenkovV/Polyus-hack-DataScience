@@ -50,8 +50,8 @@ const labelContent = (e) => e.category;
 
 const Circular = (props) => {
   return (
-    <Chart>
-      <ChartTitle text="" />
+    <Chart style={{ height: 350 }}>
+      <ChartTitle text="Aboba" />
       <ChartLegend visible={false} />
       <ChartSeries>
         <ChartSeriesItem
