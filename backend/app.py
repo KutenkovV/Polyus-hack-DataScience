@@ -9,8 +9,8 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 
 @socketio.on('my_event')
-def handle_my_custom_event(arg1, arg2, arg3):
-    print('received args: ' + arg1 + arg2 + arg3)
+def handle_my_custom_event():
+    emit('message', 'Hello')
 
 
 @ socketio.on('json')

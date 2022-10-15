@@ -20,8 +20,8 @@ function App() {
       setIsConnected(false);
     });
 
-    socket.on('message', () => {
-      setLastPong(new Date().toISOString());
+    socket.on('message', (data) => {
+      setLastPong(data);
     });
 
     return () => {
