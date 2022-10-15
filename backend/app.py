@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import sqlite3 as sql
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
-from flask import jsonify, json, send_file
+from flask import jsonify, json, send_file, make_response
 
 #ML
 # import matplotlib.pyplot as plt
@@ -19,8 +19,6 @@ from flask import jsonify, json, send_file
 # from detectron2.layers import paste_masks_in_image
 import os
 import sys
-sys.path.append('/content/gdrive/MyDrive/yolov7')
-
 
 import argparse
 import time
@@ -39,7 +37,6 @@ from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized, TracedModel
 import pickle
 import base64
-
 
 def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
     # Resize and pad image while meeting stride-multiple constraints
@@ -74,11 +71,9 @@ def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scale
     return img, ratio, (dw, dh)
 
 
-
-
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+# socketio = SocketIO(app, cors_allowed_origins="*")
 
 
 ##################ML
@@ -101,33 +96,22 @@ opt  = {
 }
 source_image_path = 'frame1250.jpg'
 
-weights, imgsz = opt['weights'], opt['img-size']
-set_logging()
-device = select_device(opt['device'])
-half = device.type != 'cpu'
-model = attempt_load(weights, map_location=device)  # load FP32 model
-stride = int(model.stride.max())  # model stride
-imgsz = check_img_size(imgsz, s=stride)  # check img_size
-if half:
-    model.half()
 
+# @socketio.on('my_event')
+# def handle_my_custom_event():
+#     emit('message', 'Hello')
 
-@socketio.on('my_event')
-def handle_my_custom_event():
-    emit('message', 'Hello')
+# @ socketio.on('json')
+# def handle_json(json):
+#     send(json, json=True)
 
-@ socketio.on('json')
-def handle_json(json):
-    send(json, json=True)
+# @ socketio.on('my event')
+# def handle_my_custom_event(json):
+#     emit('my response', json)
 
-@ socketio.on('my event')
-def handle_my_custom_event(json):
-    emit('my response', json)
-
-@ socketio.on('my event')
-def handle_my_custom_event(json):
-    emit('my response', json)
-
+# @ socketio.on('my event')
+# def handle_my_custom_event(json):
+#     emit('my response', json)
 
 @ app.route('/addrec', methods=['POST', 'GET'])
 def addrec():
@@ -186,9 +170,10 @@ def im2json(im):
     jstr = json.dumps({"image": base64.b64encode(imdata).decode('ascii')})
     return jstr
 
+
 ####################################################
 @ app.route('/get-image')
-def model():
+def modelaa():
     with torch.no_grad():
         weights, imgsz = opt['weights'], opt['img-size']
         set_logging()
@@ -199,7 +184,7 @@ def model():
         imgsz = check_img_size(imgsz, s=stride)  # check img_size
         if half:
             model.half()
-        
+
         names = model.module.names if hasattr(model, 'module') else model.names
         colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
         if device.type != 'cpu':
@@ -244,13 +229,12 @@ def model():
                 label = f'{names[int(cls)]} {conf:.2f}'
                 plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=3)
 
-    # _, img_encoded = cv2.imencode('.jpg', img0)
+    retval, buffer = cv2.imencode('.jpg', img0)
+    jpg_as_text = base64.b64encode(buffer)
 
-    return im2json(img0)
-    #return send_file(im2json(img0), mimetype='image/png')
-    # return jsonify(img_encoded)
-
+    return jsonify({"image": jpg_as_text.decode("utf-8")})
 
 
-if __name__ == '__main__':
-    socketio.run(app)
+
+# if __name__ == '__main__':
+    # socketio.run(app)
