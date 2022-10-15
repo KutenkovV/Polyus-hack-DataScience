@@ -6,7 +6,7 @@ const Analysis = () => {
     <>
       <div>
         <label className="form-label">Введите размер негабарита</label>
-        <input className="form-control" type="number" min="0" step="1"></input>
+        <input style={{ width: "50%"}} className="form-control" type="number" min="0" step="1"></input>
       </div>
       <div className="pt-2">
         <label className="form-label">Гранулометрический состав руды</label>

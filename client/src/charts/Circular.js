@@ -12,7 +12,6 @@ const applicationsStatus = [
     status: "14%",
     value: 14,
     color: COLORS.one,
-    
   },
   {
     status: "13%",
@@ -51,7 +50,7 @@ const labelContent = (e) => e.category;
 const Circular = (props) => {
   return (
     <Chart style={{ height: 350 }}>
-      <ChartLegend visible={false} />
+      <ChartLegend visible={true} />
       <ChartSeries>
         <ChartSeriesItem
           type="donut"
