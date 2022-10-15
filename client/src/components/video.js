@@ -6,7 +6,6 @@ const Video = () => {
   const axios = require('axios').default;
   const [data, setData] = useState();
   const handleSub = async () => {
-
   };
 
   useEffect(() => {
@@ -20,7 +19,6 @@ const Video = () => {
     })
     .then(function () {
     });
-    console.log("!!!!!!!!!!!!!!!")
   } , []);
 
   
@@ -29,7 +27,7 @@ const Video = () => {
     //   <source src="/" type="video/mp4" />
     // </video>
     
-    <img onChange={handleSub} src={`data:image/png;base64, ${data}`} alt="Red dot" />
+    <img width="100%" onChange={handleSub} src={`data:image/png;base64, ${data}`} alt="Red dot" />
   );
 };
 
