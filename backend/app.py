@@ -77,13 +77,6 @@ CORS(app)
 
 
 ##################ML
-# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# with open('model/hyp.yaml') as f:
-#     hyp = yaml.load(f, Loader=yaml.FullLoader)
-# weigths = torch.load('model/best.pt')
-# model = weigths['model']
-# model = model.half().to(device)
-# _ = model.eval()
 classes_to_filter = None  #You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
 opt  = {
     "weights": "model/best.pt", # Path to weights file default weights are for nano model
@@ -95,6 +88,21 @@ opt  = {
     "classes" : classes_to_filter  # list of classes to filter or None
 }
 source_image_path = 'frame1250.jpg'
+weights, imgsz = opt['weights'], opt['img-size']
+set_logging()
+device = select_device(opt['device'])
+half = device.type != 'cpu'
+model = attempt_load(weights, map_location=device)  # load FP32 model
+stride = int(model.stride.max())  # model stride
+imgsz = check_img_size(imgsz, s=stride)  # check img_size
+if half:
+    model.half()
+
+names = model.module.names if hasattr(model, 'module') else model.names
+colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
+if device.type != 'cpu':
+    model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))
+
 
 
 # @socketio.on('my_event')
@@ -173,23 +181,8 @@ def im2json(im):
 
 ####################################################
 @ app.route('/get-image')
-def modelaa():
+def predict_model():
     with torch.no_grad():
-        weights, imgsz = opt['weights'], opt['img-size']
-        set_logging()
-        device = select_device(opt['device'])
-        half = device.type != 'cpu'
-        model = attempt_load(weights, map_location=device)  # load FP32 model
-        stride = int(model.stride.max())  # model stride
-        imgsz = check_img_size(imgsz, s=stride)  # check img_size
-        if half:
-            model.half()
-
-        names = model.module.names if hasattr(model, 'module') else model.names
-        colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
-        if device.type != 'cpu':
-            model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))
-
         img0 = cv2.imread(source_image_path)
         img = letterbox(img0, imgsz, stride=stride)[0]
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
