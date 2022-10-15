@@ -1,9 +1,9 @@
 export const COLORS = {
-    one: "#FB3E3E",
-    two: "#FFF95F",
-    three: "#54FC05",
-    four: "#00FFB2",
-    five: "#00FFFF",
-    six: "#5FC5FF",
-    seven: "#9E9CFF",
-  };
+  1: '#FB3E3E',
+  2: '#FFF95F',
+  3: '#54FC05',
+  4: '#00FFB2',
+  5: '#00FFFF',
+  6: '#5FC5FF',
+  7: '#9E9CFF',
+};

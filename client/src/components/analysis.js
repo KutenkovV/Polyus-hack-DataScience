@@ -1,25 +1,19 @@
-import "../components/analysis.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect, useState } from "react";
+import '../components/analysis.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useEffect, useState } from 'react';
 
-const Analysis = ({ data }) => {
-  const [dataa, setData] = useState([]);
-
-  useEffect(() => {
-    setData([data]);
-  }, []);
-
+const Analysis = ({ propertyes }) => {
+  const all = propertyes.reduce((all, p) => (all += p), 0);
   return (
     <>
       <div>
         <label className="form-label">Введите размер негабарита</label>
         <input
-          style={{ width: "50%" }}
+          style={{ width: '50%' }}
           className="form-control"
           type="number"
           min="0"
-          step="1"
-        ></input>
+          step="1"></input>
       </div>
       <div className="pt-2">
         <label className="form-label">Гранулометрический состав руды</label>
@@ -32,12 +26,14 @@ const Analysis = ({ data }) => {
             </tr>
           </thead>
           <tbody>
-            {/* Не придумал как другие атрибуты выводить по колонкам */}
-            {/* {dataa.map((item) => (
-              <tr>
-                <td>{item.propertyes}</td>
-              </tr>
-            ))} */}
+            {propertyes &&
+              propertyes.map((property, idx) => (
+                <tr>
+                  <td>{idx + 1}</td>
+                  <td>{property}</td>
+                  <td> {(property / all) * 100}%</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

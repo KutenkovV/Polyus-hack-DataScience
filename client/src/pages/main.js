@@ -1,29 +1,32 @@
-import "../pages/main.css";
-import Video from "../components/video";
-import Analysis from "../components/analysis";
-import { useEffect, useState } from "react";
-import "@progress/kendo-theme-material/dist/all.css";
-import Circular from "../charts/Circular";
-import MaxSize from "../charts/MaxSize";
-import ChartOne from "../charts/ChartOne";
-import axios from "axios";
+import '../pages/main.css';
+import Video from '../components/video';
+import Analysis from '../components/analysis';
+import { useEffect, useState } from 'react';
+import '@progress/kendo-theme-material/dist/all.css';
+import Circular from '../charts/Circular';
+import MaxSize from '../charts/MaxSize';
+import ChartOne from '../charts/ChartOne';
+import axios from 'axios';
 
-
-import io from "socket.io-client";
+import io from 'socket.io-client';
 // const socket = io("http://127.0.0.1:5000/");
 
 const Main = () => {
   // Для сокетов если хоть кто-то сделает их на бэке блин
   // const [analysis, setAnalysis] = useState([]);
   // const [maxSize, setMaxSize] = useState([]);
-  const [data, setData] = useState();
+  const [propertyes, setPropertyes] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Axios is worked!");
+    console.log('Axios is worked!');
+    setIsLoading(true);
     axios
-      .get("http://127.0.0.1:5000/get-image")
+      .get('http://127.0.0.1:5000/get-image')
       .then((response) => {
-        setData(response.data);
+        setIsLoading(false);
+
+        setPropertyes(Object.values(response.data.propertyes));
         console.log(response);
       })
       .catch((error) => {
@@ -48,13 +51,21 @@ const Main = () => {
       <div className="m-1 d-flex">
         <div className="col-6 content_info">
           <Video />
-          <MaxSize data={data} />
+          <MaxSize data={propertyes} />
         </div>
 
         <div className="d-flex ms-3 col content_info">
           <div className="d-block col">
-            <Analysis data={data} />
-            <Circular />
+            {isLoading ? (
+              <div class="spinner-border" role="status">
+                <span className="sr-only"></span>
+              </div>
+            ) : (
+              <>
+                <Analysis propertyes={propertyes} />
+                <Circular propertyes={propertyes} />
+              </>
+            )}
             {/* <ChartOne /> */}
           </div>
         </div>
