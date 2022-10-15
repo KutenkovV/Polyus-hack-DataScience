@@ -13,20 +13,6 @@ from torchvision import transforms
 import numpy as np
 
 from utils.datasets import letterbox
-# from utils.general import non_max_suppression_mask_conf
-
-from detectron2.modeling.poolers import ROIPooler
-from detectron2.structures import Boxes
-from detectron2.utils.memory import retry_if_cuda_oom
-from detectron2.layers import paste_masks_in_image
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-with open('model/hyp.yaml') as f:
-    hyp = yaml.load(f, Loader=yaml.FullLoader)
-weigths = torch.load('model/best.pt')
-model = weigths['model']
-model = model.half().to(device)
-_ = model.eval()
 
 
 import os
@@ -51,58 +37,24 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized,
 import pickle
 import base64
 
-# def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
-#     # Resize and pad image while meeting stride-multiple constraints
-#     shape = img.shape[:2]  # current shape [height, width]
-#     if isinstance(new_shape, int):
-#         new_shape = (new_shape, new_shape)
-
-#     # Scale ratio (new / old)
-#     r = min(new_shape[0] / shape[0], new_shape[1] / shape[1])
-#     if not scaleup:  # only scale down, do not scale up (for better test mAP)
-#         r = min(r, 1.0)
-
-#     # Compute padding
-#     ratio = r, r  # width, height ratios
-#     new_unpad = int(round(shape[1] * r)), int(round(shape[0] * r))
-#     dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - \
-    #    new_unpad[1]  # wh padding
-#     if auto:  # minimum rectangle
-#         dw, dh = np.mod(dw, stride), np.mod(dh, stride)  # wh padding
-#     elif scaleFill:  # stretch
-#         dw, dh = 0.0, 0.0
-#         new_unpad = (new_shape[1], new_shape[0])
-#         ratio = new_shape[1] / shape[1], new_shape[0] / \
-      #      shape[0]  # width, height ratios
-
-#     dw /= 2  # divide padding into 2 sides
-#     dh /= 2
-
-#     if shape[::-1] != new_unpad:  # resize
-#         img = cv2.resize(img, new_unpad, interpolation=cv2.INTER_LINEAR)
-#     top, bottom = int(round(dh - 0.1)), int(round(dh + 0.1))
-#     left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
-#     img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
-#     return img, ratio, (dw, dh)
-
 
 app = Flask(__name__)
 CORS(app)
 # socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-##################ML
+################## ML ######################
 classes_to_filter = None  #You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
 opt  = {
     "weights": "model/best.pt", # Path to weights file default weights are for nano model
     "yaml"   : "model/hyp.yaml",
     "img-size": 1280, # default image size
-    "conf-thres": 0.3, # confidence threshold for inference.
-    "iou-thres" : 0.45, # NMS IoU threshold for inference.
+    "conf-thres": 0.4, # confidence threshold for inference.
+    "iou-thres" : 0.6, # NMS IoU threshold for inference.
     "device" : 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
     "classes" : classes_to_filter  # list of classes to filter or None
 }
-source_image_path = 'frame1250.jpg'
+source_image_path = 'frame1250.jpg'#frame1250  frame1363 frame357
 weights, image_width = opt['weights'], opt['img-size']
 set_logging()
 device = select_device(opt['device'])
@@ -188,6 +140,9 @@ def list():
 
 
 ####################################################
+
+max_ore_size = 350;
+
 def calc_mm_in_px(width_image, band_width, sm_in_band_width):
     mm_in_px = width_image*sm_in_band_width/band_width
     return mm_in_px/width_image
@@ -209,6 +164,8 @@ def calc_stat(object_width, object_height):
     # print(biggest_size)
 
     if biggest_size > 250:
+        if biggest_size >= max_ore_size:
+            return 10
         return 1
     elif biggest_size > 150:
         return 2
@@ -252,8 +209,8 @@ def predict_model():
                 classes.append(opt['classes'].index(class_name))
 
         pred = non_max_suppression(predict, opt['conf-thres'], opt['iou-thres'], classes= classes, agnostic= False)
-        print(pred)
-        result_dict={1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}
+        #print(pred)
+        result_dict={1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 10:0}
         for i, det in enumerate(pred):
             s = ''
             s += '%gx%g ' % img.shape[2:]  # print string
@@ -270,7 +227,7 @@ def predict_model():
                         float(xyxy[3]) + float(xyxy[1])
                         )
                 ] += 1
-        # print(result_dict)
+        print(result_dict)
                 
 
 
