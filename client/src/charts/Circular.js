@@ -45,8 +45,6 @@ const applicationsStatus = [
   },
 ];
 
-const labelContent = (e) => e.category;
-
 const Circular = (props) => {
   return (
     <Chart style={{ height: 350 }}>
@@ -61,7 +59,6 @@ const Circular = (props) => {
           <ChartSeriesLabels
             color="#fff"
             background="none"
-            content={labelContent}
           />
         </ChartSeriesItem>
       </ChartSeries>
