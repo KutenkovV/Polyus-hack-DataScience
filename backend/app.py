@@ -54,7 +54,7 @@ opt  = {
     "device" : 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
     "classes" : classes_to_filter  # list of classes to filter or None
 }
-source_image_path = 'frame357.jpg'#frame1250  frame1363
+source_image_path = 'frame1250.jpg'#frame1250  frame1363 frame357
 weights, image_width = opt['weights'], opt['img-size']
 set_logging()
 device = select_device(opt['device'])
