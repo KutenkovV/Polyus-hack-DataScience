@@ -14,7 +14,7 @@ export const series = [
   },
 ];
 
-const MaxSize = (props) => {
+const MaxSize = ({ data }) => {
   return (
     <Chart pannable zoomable style={{ height: 350 }}>
       <ChartTitle text="Максимальный размер частиц" />

@@ -1,7 +1,7 @@
 import '../components/analysis.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Analysis = () => {
+const Analysis = ({ data }) => {
   return (
     <>
       <div>

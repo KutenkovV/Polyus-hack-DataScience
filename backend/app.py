@@ -65,13 +65,15 @@ import base64
 #     # Compute padding
 #     ratio = r, r  # width, height ratios
 #     new_unpad = int(round(shape[1] * r)), int(round(shape[0] * r))
-#     dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - new_unpad[1]  # wh padding
+#     dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - \
+        new_unpad[1]  # wh padding
 #     if auto:  # minimum rectangle
 #         dw, dh = np.mod(dw, stride), np.mod(dh, stride)  # wh padding
 #     elif scaleFill:  # stretch
 #         dw, dh = 0.0, 0.0
 #         new_unpad = (new_shape[1], new_shape[0])
-#         ratio = new_shape[1] / shape[1], new_shape[0] / shape[0]  # width, height ratios
+#         ratio = new_shape[1] / shape[1], new_shape[0] / \
+            shape[0]  # width, height ratios
 
 #     dw /= 2  # divide padding into 2 sides
 #     dh /= 2
@@ -240,7 +242,7 @@ def predict_model():
 
         # Inference
         t1 = time_synchronized()
-        predict = model(img, augment= False)[0]
+        predict = model(img, augment=False)[0]
 
         # Apply NMS
         classes = None
@@ -276,7 +278,6 @@ def predict_model():
     jpg_as_text = base64.b64encode(buffer)
 
     return jsonify({"image": jpg_as_text.decode("utf-8"), 'propertyes': result_dict})
-
 
 
 # if __name__ == '__main__':
