@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import sqlite3 as sql
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
-from flask import jsonify, json, send_file, make_response
+from flask import jsonify, json, send_file, make_response, request
 
 #ML
 import matplotlib.pyplot as plt
@@ -40,8 +40,7 @@ import base64
 
 app = Flask(__name__)
 CORS(app)
-# socketio = SocketIO(app, cors_allowed_origins="*")
-
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 ################## ML ######################
 classes_to_filter = None  #You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
@@ -71,6 +70,35 @@ if device.type != 'cpu':
     model(torch.zeros(1, 3, image_width, image_width).to(device).type_as(next(model.parameters())))
 
 
+
+
+app.debug = True
+app.host = 'localhost'
+
+@app.route("/http-call")
+def http_call():
+    """return JSON with string data as the value"""
+    data = {'data':'This text was fetched using an HTTP call to server on render'}
+    return jsonify(data)
+
+@socketio.on("connect")
+def connected():
+    """event listener when client connects to the server"""
+    print(request.sid)
+    print("client has connected")
+    emit("connect",{"data":f"id: {request.sid} is connected"})
+
+@socketio.on('data')
+def handle_message(data):
+    """event listener when client types a message"""
+    print("data from the front end: ",str(data))
+    emit("data",{'data':data,'id':request.sid},broadcast=True)
+ 
+@socketio.on("disconnect")
+def disconnected():
+    """event listener when client disconnects to the server"""
+    print("user disconnected")
+    emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
 
 # @socketio.on('my_event')
 # def handle_my_custom_event():
@@ -181,7 +209,7 @@ def calc_stat(object_width, object_height):
         return 6
     return None
 
-    
+
 
 @ app.route('/get-image')
 def predict_model():
@@ -237,5 +265,5 @@ def predict_model():
     return jsonify({"image": jpg_as_text.decode("utf-8"), 'propertyes': result_dict})
 
 
-# if __name__ == '__main__':
-    # socketio.run(app)
+if __name__ == '__main__':
+    socketio.run(app)

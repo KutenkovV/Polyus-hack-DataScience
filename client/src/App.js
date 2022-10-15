@@ -1,45 +1,74 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Main from './pages/main';
-
 import io from 'socket.io-client';
 import { useEffect, useState } from 'react';
 
-// const socket = io('http://127.0.0.1:5000/');
-
+const socket = io("localhost:5000/", {
+  transports: ["websocket"],
+  cors: {
+    origin: "http://localhost:3000/",
+  },
+});
 function App() {
-  // const [isConnected, setIsConnected] = useState(socket.connected);
-  // const [lastPong, setLastPong] = useState(null);
+  const [socketInstance, setSocketInstance] = useState("");
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [message, setMessage] = useState("");
+  //socket.emit("data", message);
 
-  // useEffect(() => {
-  //   socket.on('connect', () => {
-  //     setIsConnected(true);
-  //   });
+  useEffect(() => {
+    setSocketInstance(socket);
 
-  //   socket.on('disconnect', () => {
-  //     setIsConnected(false);
-  //   });
+    socket.on("connect", (data) => {
+      console.log(data);
+    });
 
-  //   socket.on('message', (data) => {
-  //     setLastPong(data);
-  //   });
+    socket.on("disconnect", (data) => {
+      console.log(data);
+    });
 
-  //   return () => {
-  //     socket.off('connect');
-  //     socket.off('disconnect');
-  //     socket.off('pong');
-  //   };
-  // }, []);
+    return function cleanup() {
+      socket.disconnect();
+    };
 
-  // const sendPing = () => {
-  //   socket.emit('my_event');
-  // };
+    // socket.on('connect', () => {
+    //   setIsConnected(true);
+    // });
+
+    // socket.on('disconnect', () => {
+    //   setIsConnected(false);
+    // });
+
+    // socket.on('message', (data) => {
+    //   setLastPong(data);
+    // });
+
+    // return () => {
+    //   socket.off('connect');
+    //   socket.off('disconnect');
+    //   socket.off('pong');
+    // };
+  }, []);
+  
+  useEffect(() => {
+    socket.on("data", (data) => {
+      setMessage(data.data);
+    });
+    return () => {
+      socket.off("data", () => {
+        console.log("data event was removed");
+      });
+    };
+  }, [socket, message]);
+
 
   return (
     <div className="content">
       {/* <p>Connected: {'' + isConnected}</p>
       <p>Last pong: {lastPong || '-'}</p> */}
       {/* <button onClick={sendPing}>Send ping</button> */}
+      <p>Connected: {'' + isConnected}</p>
+      <p>Last pong: {message || '-'}</p>
       <Router>
         <Routes>
           <Route path="/" element={<Main />} />
