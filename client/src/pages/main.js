@@ -5,6 +5,7 @@ import Analysis from "../components/analysis";
 import "@progress/kendo-theme-material/dist/all.css";
 import Circular from "./../charts/Circular";
 import MaxSize from "./../charts/MaxSize";
+import ChartOne from "../charts/ChartOne";
 
 function main() {
 
@@ -14,6 +15,9 @@ function main() {
         <div className="col-6 content_info">
           <Video />
           <MaxSize />
+
+          {/* <ChartOne /> */}
+          
         </div>
         
         <div className="d-flex ms-3 col content_info">
