@@ -1,22 +1,21 @@
-import '../components/video.css';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import "../components/video.css";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 const Video = () => {
   const [data, setData] = useState();
-  const handleSub = async () => {};
 
   useEffect(() => {
+    console.log("Axios is worked!");
     axios
-      .get('http://127.0.0.1:5000/get-image')
-      .then(function (response) {
+      .get("http://127.0.0.1:5000/get-image")
+      .then((response) => {
         setData(response.data.image);
         console.log(response);
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
-      })
-      .then(function () {});
-    console.log('!!!!!!!!!!!!!!!');
+      });
   }, []);
 
   return (
@@ -24,7 +23,7 @@ const Video = () => {
     //   <source src="/" type="video/mp4" />
     // </video>
 
-    <img onChange={handleSub} width="100%" src={`data:image/png;base64, ${data}`} alt="Red dot" />
+    <img width="100%" src={`data:image/png;base64, ${data}`} alt="Red dot" />
   );
 };
 

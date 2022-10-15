@@ -1,6 +1,6 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Main from './pages/main';
+import Main from './pages/Main';
 
 import io from 'socket.io-client';
 import { useEffect, useState } from 'react';
