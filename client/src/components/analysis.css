@@ -6,9 +6,9 @@ td {
     vertical-align: middle;
 }
 
-table tr td:first-child {
+/* table tr td:first-child {
     padding-left: 30px;
-}
+} */
 
 .table {
     margin-bottom: 0%;

@@ -7,7 +7,6 @@ import {
   ChartTitle,
   ChartLegend,
 } from "@progress/kendo-react-charts";
-import { COLORS } from "./colors";
 
 export const series = [
   {
