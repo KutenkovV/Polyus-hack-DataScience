@@ -4,7 +4,7 @@ from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 from flask import jsonify, json, send_file, make_response
 
-#ML
+# ML
 # import matplotlib.pyplot as plt
 # import torch
 # import cv2
@@ -38,6 +38,7 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized,
 import pickle
 import base64
 
+
 def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
     # Resize and pad image while meeting stride-multiple constraints
     shape = img.shape[:2]  # current shape [height, width]
@@ -52,13 +53,15 @@ def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scale
     # Compute padding
     ratio = r, r  # width, height ratios
     new_unpad = int(round(shape[1] * r)), int(round(shape[0] * r))
-    dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - new_unpad[1]  # wh padding
+    dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - \
+        new_unpad[1]  # wh padding
     if auto:  # minimum rectangle
         dw, dh = np.mod(dw, stride), np.mod(dh, stride)  # wh padding
     elif scaleFill:  # stretch
         dw, dh = 0.0, 0.0
         new_unpad = (new_shape[1], new_shape[0])
-        ratio = new_shape[1] / shape[1], new_shape[0] / shape[0]  # width, height ratios
+        ratio = new_shape[1] / shape[1], new_shape[0] / \
+            shape[0]  # width, height ratios
 
     dw /= 2  # divide padding into 2 sides
     dh /= 2
@@ -67,25 +70,27 @@ def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scale
         img = cv2.resize(img, new_unpad, interpolation=cv2.INTER_LINEAR)
     top, bottom = int(round(dh - 0.1)), int(round(dh + 0.1))
     left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
-    img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
+    img = cv2.copyMakeBorder(
+        img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
     return img, ratio, (dw, dh)
 
 
 app = Flask(__name__)
 CORS(app)
-# socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-##################ML
-classes_to_filter = None  #You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
-opt  = {
-    "weights": "model/best.pt", # Path to weights file default weights are for nano model
-    "yaml"   : "model/hyp.yaml",
-    "img-size": 1280, # default image size
-    "conf-thres": 0.25, # confidence threshold for inference.
-    "iou-thres" : 0.45, # NMS IoU threshold for inference.
-    "device" : 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
-    "classes" : classes_to_filter  # list of classes to filter or None
+# ML
+# You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
+classes_to_filter = None
+opt = {
+    "weights": "model/best.pt",  # Path to weights file default weights are for nano model
+    "yaml": "model/hyp.yaml",
+    "img-size": 1280,  # default image size
+    "conf-thres": 0.25,  # confidence threshold for inference.
+    "iou-thres": 0.45,  # NMS IoU threshold for inference.
+    "device": 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
+    "classes": classes_to_filter  # list of classes to filter or None
 }
 source_image_path = 'frame1250.jpg'
 weights, imgsz = opt['weights'], opt['img-size']
@@ -101,8 +106,8 @@ if half:
 names = model.module.names if hasattr(model, 'module') else model.names
 colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
 if device.type != 'cpu':
-    model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))
-
+    model(torch.zeros(1, 3, imgsz, imgsz).to(
+        device).type_as(next(model.parameters())))
 
 
 # @socketio.on('my_event')
@@ -195,7 +200,7 @@ def predict_model():
 
         # Inference
         t1 = time_synchronized()
-        predict = model(img, augment= False)[0]
+        predict = model(img, augment=False)[0]
 
         # Apply NMS
         classes = None
@@ -204,15 +209,16 @@ def predict_model():
             for class_name in opt['classes']:
                 classes.append(opt['classes'].index(class_name))
 
-
-        pred = non_max_suppression(predict, opt['conf-thres'], opt['iou-thres'], classes= classes, agnostic= False)
+        pred = non_max_suppression(
+            predict, opt['conf-thres'], opt['iou-thres'], classes=classes, agnostic=False)
         t2 = time_synchronized()
         for i, det in enumerate(pred):
             s = ''
             s += '%gx%g ' % img.shape[2:]  # print string
             gn = torch.tensor(img0.shape)[[1, 0, 1, 0]]
             if len(det):
-                det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
+                det[:, :4] = scale_coords(
+                    img.shape[2:], det[:, :4], img0.shape).round()
 
             for c in det[:, -1].unique():
                 n = (det[:, -1] == c).sum()  # detections per class
@@ -220,14 +226,14 @@ def predict_model():
 
             for *xyxy, conf, cls in reversed(det):
                 label = f'{names[int(cls)]} {conf:.2f}'
-                plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=3)
-
-    retval, buffer = cv2.imencode('.jpg', img0)
+                plot_one_box(xyxy, img0, label=label,
+                             color=colors[int(cls)], line_thickness=3)
+    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 1]  # Сжатие картинки
+    retval, buffer = cv2.imencode('.jpg', img0, encode_param)
     jpg_as_text = base64.b64encode(buffer)
 
     return jsonify({"image": jpg_as_text.decode("utf-8")})
 
 
-
-# if __name__ == '__main__':
-    # socketio.run(app)
+if __name__ == '__main__':
+    socketio.run(app)
