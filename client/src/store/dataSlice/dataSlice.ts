@@ -11,28 +11,39 @@ export const fetchData = createAsyncThunk('data/fetchData', async () => {
 
 export interface DataState {
   image: string;
-  propertyes: number[];
+  propertyes: number[][];
 
   status: LoadingStatuses;
 }
 
 const initialState: DataState = {
   image: '',
-  propertyes: [],
+  propertyes: [[], [], [], [], [], [], [], []],
 
   status: LoadingStatuses.PENDING,
 };
 
 export const dataSlice = createSlice({
   name: 'data',
-  // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchData.fulfilled, (state, action) => {
         state.image = action.payload.image;
-        state.propertyes = Object.values(action.payload.propertyes);
+        const result = [];
+        const numbes = Object.values(action.payload.propertyes);
+        for (let i = 0; i < numbes.length; i++) {
+          if (numbes[i].length > 0) {
+            const all = numbes[i].reduce((all, num) => (all += num), 0);
+            console.log(all);
+            console.log(numbes[i].length);
+            state.propertyes[i].push(all / numbes[i].length);
+          } else {
+            state.propertyes[i].push(0);
+          }
+        }
+
         state.status = LoadingStatuses.FULFILED;
       })
       .addCase(fetchData.pending, (state) => {

@@ -50,7 +50,7 @@ const Main: React.FC = () => {
                 Ошибка загрузки
               </div>) : (
               <>
-                <Video data={image} />
+                <Video imgURL={`data:image/png;base64, ${image}`} />
                 <MaxSize data={propertyes} />
               </>
             )}
@@ -70,8 +70,8 @@ const Main: React.FC = () => {
               )
               : (
                 <>
-                  <Analysis propertyes={propertyes} />
-                  <Circular propertyes={propertyes} />
+                  <Analysis data={propertyes.map((numbes) => numbes.reduce((all2, number) => all2 += number, 0), 0)} />
+                  <Circular data={propertyes.map((numbes) => numbes.reduce((all2, number) => all2 += number, 0), 0)} />
                 </>
               )}
           </div>
