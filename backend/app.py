@@ -163,6 +163,10 @@ max_ore_size = 350
 def calc_mm_in_px(width_image, band_width, sm_in_band_width):
     mm_in_px = width_image*sm_in_band_width/band_width
     return mm_in_px/width_image
+    
+band_width = [0.08*image_width, 0.72*image_width]
+mm_in_px = calc_mm_in_px(image_width, band_width[1]-band_width[0], 160)
+
 
 
 def calc_stat(object_width, object_height):
