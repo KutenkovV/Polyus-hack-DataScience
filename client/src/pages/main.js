@@ -9,17 +9,17 @@ import ChartOne from '../charts/ChartOne';
 import axios from 'axios';
 
 import io from 'socket.io-client';
-// const socket = io("http://127.0.0.1:5000/");
+const socket = io('http://127.0.0.1:5000/');
 
 const Main = () => {
   // Для сокетов если хоть кто-то сделает их на бэке блин
   // const [analysis, setAnalysis] = useState([]);
   // const [maxSize, setMaxSize] = useState([]);
   const [propertyes, setPropertyes] = useState();
+  const [img, setImg] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log('Axios is worked!');
     setIsLoading(true);
     axios
       .get('http://127.0.0.1:5000/get-image')
@@ -27,6 +27,7 @@ const Main = () => {
         setIsLoading(false);
 
         setPropertyes(Object.values(response.data.propertyes));
+        setImg(response.data.image);
         console.log(response);
       })
       .catch((error) => {
@@ -50,14 +51,22 @@ const Main = () => {
     <>
       <div className="m-1 d-flex">
         <div className="col-6 content_info">
-          <Video />
-          <MaxSize data={propertyes} />
+          {isLoading ? (
+            <div className="spinner-border" role="status">
+              <span className="sr-only"></span>
+            </div>
+          ) : (
+            <>
+              <Video data={img} />
+              <MaxSize data={propertyes} />
+            </>
+          )}
         </div>
 
         <div className="d-flex ms-3 col content_info">
           <div className="d-block col">
             {isLoading ? (
-              <div class="spinner-border" role="status">
+              <div className="spinner-border" role="status">
                 <span className="sr-only"></span>
               </div>
             ) : (

@@ -45,15 +45,15 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 ################## ML ######################
 classes_to_filter = None  #You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
 opt  = {
-    "weights": "model/best.pt", # Path to weights file default weights are for nano model
+    "weights": "model/best (1)1280 10e.pt", # best.pt Path to weights file default weights are for nano model
     "yaml"   : "model/hyp.yaml",
     "img-size": 1280, # default image size
-    "conf-thres": 0.4, # confidence threshold for inference.
-    "iou-thres" : 0.6, # NMS IoU threshold for inference.
+    "conf-thres": 0.3, # confidence threshold for inference.
+    "iou-thres" : 0.3, # NMS IoU threshold for inference.
     "device" : 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
     "classes" : classes_to_filter  # list of classes to filter or None
 }
-source_image_path = 'frame1250.jpg'#frame1250  frame1363 frame357
+source_image_path = 'frame1363.jpg'#frame1250  frame1363 frame357
 weights, image_width = opt['weights'], opt['img-size']
 set_logging()
 device = select_device(opt['device'])
@@ -188,8 +188,8 @@ def calc_stat(object_width, object_height):
         biggest_size_height = object_height
 
     biggest_size = float(biggest_size_width or 0) + float(biggest_size_height or 0)
-    biggest_size = biggest_size * mm_in_px
-    # print(biggest_size)
+    biggest_size = round(biggest_size * mm_in_px)
+    print(biggest_size)
 
     if biggest_size > 250:
         if biggest_size >= max_ore_size:

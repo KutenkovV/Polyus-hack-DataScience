@@ -28,10 +28,10 @@ const Analysis = ({ propertyes }) => {
           <tbody>
             {propertyes &&
               propertyes.map((property, idx) => (
-                <tr>
+                <tr key={idx}>
                   <td>{idx + 1}</td>
                   <td>{property}</td>
-                  <td> {(property / all) * 100}%</td>
+                  <td> {((property / all) * 100).toPrecision(2)}%</td>
                 </tr>
               ))}
           </tbody>
