@@ -8,21 +8,7 @@ const RectShape = wrapShape(({ width, height }) => (
   <rect width={width} height={height} fill="rgba(0,0,255,0.3)" />
 ));
 
-const Video = () => {
-  const [data, setData] = useState();
-
-  useEffect(() => {
-    axios
-      .get('http://127.0.0.1:5000/get-image')
-      .then((response) => {
-        setData(response.data.image);
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
-
+const Video = ({ data }) => {
   const [shape, setShape] = useState(null);
 
   const [{ vectorHeight, vectorWidth }, setVectorDimensions] = useState({
