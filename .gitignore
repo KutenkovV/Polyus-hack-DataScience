@@ -36,3 +36,4 @@ lerna-debug.log*
 !.vscode/extensions.json
 backend/model/best (1).pt
 backend/model/best (1)1280 10e.pt
+backend/model/best-e6.pt
