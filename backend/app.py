@@ -43,16 +43,15 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 ################## ML ######################
-# You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
-classes_to_filter = None
-opt = {
-    "weights": "model/best.pt",  # Path to weights file default weights are for nano model
-    "yaml": "model/hyp.yaml",
-    "img-size": 1280,  # default image size
-    "conf-thres": 0.4,  # confidence threshold for inference.
-    "iou-thres": 0.6,  # NMS IoU threshold for inference.
-    "device": 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
-    "classes": classes_to_filter  # list of classes to filter or None
+classes_to_filter = None  #You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
+opt  = {
+    "weights": "model/best (1)1280 10e.pt", # best.pt Path to weights file default weights are for nano model
+    "yaml"   : "model/hyp.yaml",
+    "img-size": 1280, # default image size
+    "conf-thres": 0.3, # confidence threshold for inference.
+    "iou-thres" : 0.3, # NMS IoU threshold for inference.
+    "device" : 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
+    "classes" : classes_to_filter  # list of classes to filter or None
 }
 source_image_path = 'frame1250.jpg'  # frame1250  frame1363 frame357
 weights, image_width = opt['weights'], opt['img-size']
@@ -178,27 +177,26 @@ def calc_stat(object_width, object_height):
     else:
         biggest_size_height = object_height
 
-    biggest_size = float(biggest_size_width or 0) + \
-        float(biggest_size_height or 0)
-    biggest_size = biggest_size * mm_in_px
-    # print(biggest_size)
+    biggest_size = float(biggest_size_width or 0) + float(biggest_size_height or 0)
+    biggest_size = round(biggest_size * mm_in_px)
+    print(biggest_size)
 
     if biggest_size > 250:
         if biggest_size >= max_ore_size:
-            return 10
-        return 1
+            return [10,biggest_size]
+        return [1,biggest_size]
     elif biggest_size > 150:
-        return 2
+        return [2,biggest_size]
     elif biggest_size < 40:
-        return 7
+        return [7,biggest_size]
     elif biggest_size > 100:
-        return 3
+        return [3,biggest_size]
     elif biggest_size > 80:
-        return 4
+        return [4,biggest_size]
     elif biggest_size > 70:
-        return 5
+        return [5,biggest_size]
     elif biggest_size > 40:
-        return 6
+        return [6,biggest_size]
     return None
 
 
@@ -230,7 +228,7 @@ def predict_model():
         pred = non_max_suppression(
             predict, opt['conf-thres'], opt['iou-thres'], classes=classes, agnostic=False)
         # print(pred)
-        result_dict = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 10: 0}
+        result_dict = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 10: []}
         for i, det in enumerate(pred):
             s = ''
             s += '%gx%g ' % img.shape[2:]  # print string
@@ -241,14 +239,10 @@ def predict_model():
 
             for *xyxy, conf, cls in reversed(det):
                 label = f'{names[int(cls)]} {conf:.2f}'
-                plot_one_box(xyxy, img0, label=label,
-                             color=colors[int(cls)], line_thickness=3)
-                result_dict[
-                    calc_stat(
-                        float(xyxy[2]) - float(xyxy[0]),
-                        float(xyxy[3]) + float(xyxy[1])
-                    )
-                ] += 1
+                plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=3)
+                box_size = [float(xyxy[2]) - float(xyxy[0]),float(xyxy[3]) + float(xyxy[1])]
+                calc_state = calc_stat(box_size[0],box_size[1])
+                result_dict[calc_state[0]].append(calc_state[1])
         print(result_dict)
 
     retval, buffer = cv2.imencode('.jpg', img0)
