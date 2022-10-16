@@ -8,8 +8,14 @@ const RectShape = wrapShape(({ width, height }) => (
   <rect width={width} height={height} fill="rgba(0,0,255,0.3)" />
 ));
 
-const Video = ({ data }) => {
-  const [shape, setShape] = useState(null);
+export interface IVideoProps {
+  imgURL: string
+}
+
+interface Rect { x: number, y: number, width: number, height: number }
+
+const Video: React.FC<IVideoProps> = ({ imgURL }) => {
+  const [shape, setShape] = useState<Rect | null>(null);
 
   const [{ vectorHeight, vectorWidth }, setVectorDimensions] = useState({
     vectorHeight: 0,
@@ -27,7 +33,7 @@ const Video = ({ data }) => {
       vectorHeight={vectorHeight}>
       <ImageLayer
         // Photo by Sarah Gualtieri on Unsplash
-        src={`data:image/png;base64, ${data}`}
+        src={imgURL}
         onLoad={({ naturalWidth, naturalHeight }) => {
           setVectorDimensions({
             vectorWidth: naturalWidth,

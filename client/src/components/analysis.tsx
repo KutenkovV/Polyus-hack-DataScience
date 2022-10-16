@@ -2,8 +2,13 @@ import '../components/analysis.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 
-const Analysis = ({ propertyes }) => {
-  const all = propertyes.reduce((all, p) => (all += p), 0);
+interface IAnalysisProps {
+  data: number[]
+}
+
+const Analysis: React.FC<IAnalysisProps> = ({ data }) => {
+  console.log(data)
+  const all = data.reduce((all, p) => (all += p), 0);
   return (
     <>
       <div>
@@ -26,12 +31,12 @@ const Analysis = ({ propertyes }) => {
             </tr>
           </thead>
           <tbody>
-            {propertyes &&
-              propertyes.map((property, idx) => (
+            {data &&
+              data.map((property, idx) => (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
                   <td>{property}</td>
-                  <td> {((property / all) * 100).toPrecision(2)}%</td>
+                  <td> {((property / all) * 100).toFixed(2)}%</td>
                 </tr>
               ))}
           </tbody>

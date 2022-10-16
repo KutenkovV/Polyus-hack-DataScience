@@ -1,4 +1,7 @@
-export const COLORS = {
+interface ICOLOR {
+  [key: number]: string;
+}
+export const COLORS: ICOLOR = {
   1: '#FB3E3E',
   2: '#FFF95F',
   3: '#54FC05',
