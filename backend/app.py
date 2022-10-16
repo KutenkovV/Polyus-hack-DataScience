@@ -43,15 +43,17 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 ################## ML ######################
-classes_to_filter = None  #You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
-opt  = {
-    "weights": "model/best-e6.pt", # best.pt Path to weights file default weights are for nano model
-    "yaml"   : "model/hyp-e6.yaml",
-    "img-size": 1280, # default image size
-    "conf-thres": 0.6, # confidence threshold for inference.
-    "iou-thres" : 0.25, # NMS IoU threshold for inference.
-    "device" : 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
-    "classes" : classes_to_filter  # list of classes to filter or None
+# You can give list of classes to filter by name, Be happy you don't have to put class number. ['train','person' ]
+classes_to_filter = None
+opt = {
+    # best.pt Path to weights file default weights are for nano model
+    "weights": "model/best.pt",
+    "yaml": "model/hyp.yaml",
+    "img-size": 1280,  # default image size
+    "conf-thres": 0.6,  # confidence threshold for inference.
+    "iou-thres": 0.25,  # NMS IoU threshold for inference.
+    "device": 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
+    "classes": classes_to_filter  # list of classes to filter or None
 }
 source_image_path = 'frame1250.jpg'  # frame1250  frame1363 frame357
 weights, image_width = opt['weights'], opt['img-size']
@@ -172,26 +174,27 @@ def calc_stat(object_width, object_height):
     else:
         biggest_size_height = object_height
 
-    biggest_size = float(biggest_size_width or 0) + float(biggest_size_height or 0)
+    biggest_size = float(biggest_size_width or 0) + \
+        float(biggest_size_height or 0)
     biggest_size = round(biggest_size * mm_in_px)
     print(biggest_size)
 
     if biggest_size > 250:
         if biggest_size >= max_ore_size:
-            return [10,biggest_size]
-        return [1,biggest_size]
+            return [10, biggest_size]
+        return [1, biggest_size]
     elif biggest_size > 150:
-        return [2,biggest_size]
+        return [2, biggest_size]
     elif biggest_size < 40:
-        return [7,biggest_size]
+        return [7, biggest_size]
     elif biggest_size > 100:
-        return [3,biggest_size]
+        return [3, biggest_size]
     elif biggest_size > 80:
-        return [4,biggest_size]
+        return [4, biggest_size]
     elif biggest_size > 70:
-        return [5,biggest_size]
+        return [5, biggest_size]
     elif biggest_size > 40:
-        return [6,biggest_size]
+        return [6, biggest_size]
     return None
 
 def line_intersection(line1, line2):
@@ -241,17 +244,17 @@ print('calc_working_area_lines()')
 
 @ app.route('/get-image')
 def predict_model():
-    # with torch.no_grad():
-    img0 = cv2.imread(source_image_path)
-    img = letterbox(img0, image_width, stride=stride)[0]
-    # img = cv2.resize(img0, (1280,720),interpolation=cv2.INTER_LINEAR)
-    img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
-    img = np.ascontiguousarray(img)
-    img = torch.from_numpy(img).to(device)
-    img = img.half() if half else img.float()  # uint8 to fp16/32
-    img /= 255.0  # 0 - 255 to 0.0 - 1.0
-    if img.ndimension() == 3:
-        img = img.unsqueeze(0)
+    with torch.no_grad():
+        img0 = cv2.imread(source_image_path)
+        img = letterbox(img0, image_width, stride=stride)[0]
+        # img = cv2.resize(img0, (1280,720),interpolation=cv2.INTER_LINEAR)
+        img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
+        img = np.ascontiguousarray(img)
+        img = torch.from_numpy(img).to(device)
+        img = img.half() if half else img.float()  # uint8 to fp16/32
+        img /= 255.0  # 0 - 255 to 0.0 - 1.0
+        if img.ndimension() == 3:
+            img = img.unsqueeze(0)
 
     # Inference
     predict = model(img, augment=False)[0]
