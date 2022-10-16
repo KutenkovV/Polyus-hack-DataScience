@@ -4,71 +4,50 @@ import Main from './pages/main';
 import io from 'socket.io-client';
 import { useEffect, useState } from 'react';
 
-const socket = io("localhost:5000/", {
-  transports: ["websocket"],
-  cors: {
-    origin: "http://localhost:3000/",
-  },
-});
+const socket = io('localhost:5000/');
 function App() {
-  const [socketInstance, setSocketInstance] = useState("");
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [message, setMessage] = useState("");
-  //socket.emit("data", message);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    setSocketInstance(socket);
-
-    socket.on("connect", (data) => {
+    socket.on('connect', (data) => {
+      setIsConnected(true);
       console.log(data);
     });
 
-    socket.on("disconnect", (data) => {
+    socket.on('disconnect', (data) => {
+      setIsConnected(false);
+
       console.log(data);
     });
 
-    return function cleanup() {
-      socket.disconnect();
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('pong');
     };
-
-    // socket.on('connect', () => {
-    //   setIsConnected(true);
-    // });
-
-    // socket.on('disconnect', () => {
-    //   setIsConnected(false);
-    // });
-
-    // socket.on('message', (data) => {
-    //   setLastPong(data);
-    // });
-
-    // return () => {
-    //   socket.off('connect');
-    //   socket.off('disconnect');
-    //   socket.off('pong');
-    // };
   }, []);
-  
+
+  const sendPing = () => {
+    socket.emit('message');
+  };
+
   useEffect(() => {
-    socket.on("data", (data) => {
-      setMessage(data.data);
+    socket.on('message', (data) => {
+      setMessage(data);
     });
     return () => {
-      socket.off("data", () => {
-        console.log("data event was removed");
+      socket.off('message', () => {
+        console.log('data event was removed');
       });
     };
   }, [socket, message]);
 
-
   return (
     <div className="content">
-      {/* <p>Connected: {'' + isConnected}</p>
-      <p>Last pong: {lastPong || '-'}</p> */}
-      {/* <button onClick={sendPing}>Send ping</button> */}
       <p>Connected: {'' + isConnected}</p>
       <p>Last pong: {message || '-'}</p>
+      <button onClick={sendPing}>MESSAGE SEND</button>
       <Router>
         <Routes>
           <Route path="/" element={<Main />} />

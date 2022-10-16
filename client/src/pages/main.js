@@ -8,9 +8,6 @@ import MaxSize from '../charts/MaxSize';
 import ChartOne from '../charts/ChartOne';
 import axios from 'axios';
 
-import io from 'socket.io-client';
-const socket = io('http://127.0.0.1:5000/');
-
 const Main = () => {
   // Для сокетов если хоть кто-то сделает их на бэке блин
   // const [analysis, setAnalysis] = useState([]);
@@ -28,11 +25,8 @@ const Main = () => {
 
         setPropertyes(Object.values(response.data.propertyes));
         setImg(response.data.image);
-        console.log(response);
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((error) => {});
   }, []);
 
   // useEffect(() => {
@@ -75,7 +69,6 @@ const Main = () => {
                 <Circular propertyes={propertyes} />
               </>
             )}
-            {/* <ChartOne /> */}
           </div>
         </div>
       </div>
