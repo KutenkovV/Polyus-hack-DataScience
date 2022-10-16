@@ -4,7 +4,7 @@ from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 from flask import jsonify, json, send_file, make_response, request
 
-#ML
+# ML
 import matplotlib.pyplot as plt
 import torch
 import cv2
@@ -53,7 +53,7 @@ opt  = {
     "device" : 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
     "classes" : classes_to_filter  # list of classes to filter or None
 }
-source_image_path = 'frame1363.jpg'#frame1250  frame1363 frame357
+source_image_path = 'frame1250.jpg'  # frame1250  frame1363 frame357
 weights, image_width = opt['weights'], opt['img-size']
 set_logging()
 device = select_device(opt['device'])
@@ -67,54 +67,40 @@ if half:
 names = model.module.names if hasattr(model, 'module') else model.names
 colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
 if device.type != 'cpu':
-    model(torch.zeros(1, 3, image_width, image_width).to(device).type_as(next(model.parameters())))
-
-
+    model(torch.zeros(1, 3, image_width, image_width).to(
+        device).type_as(next(model.parameters())))
 
 
 app.debug = True
 app.host = 'localhost'
 
+
 @app.route("/http-call")
 def http_call():
     """return JSON with string data as the value"""
-    data = {'data':'This text was fetched using an HTTP call to server on render'}
+    data = {'data': 'This text was fetched using an HTTP call to server on render'}
     return jsonify(data)
+
 
 @socketio.on("connect")
 def connected():
     """event listener when client connects to the server"""
     print(request.sid)
     print("client has connected")
-    emit("connect",{"data":f"id: {request.sid} is connected"})
+    emit("connect", {"data": f"id: {request.sid} is connected"})
 
-@socketio.on('data')
-def handle_message(data):
-    """event listener when client types a message"""
-    print("data from the front end: ",str(data))
-    emit("data",{'data':data,'id':request.sid},broadcast=True)
- 
+
+@socketio.on('message')
+def handle_message():
+    emit('message', 'json')
+
+
 @socketio.on("disconnect")
 def disconnected():
     """event listener when client disconnects to the server"""
     print("user disconnected")
-    emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
+    emit("disconnect", f"user {request.sid} disconnected", broadcast=True)
 
-# @socketio.on('my_event')
-# def handle_my_custom_event():
-#     emit('message', 'Hello')
-
-# @ socketio.on('json')
-# def handle_json(json):
-#     send(json, json=True)
-
-# @ socketio.on('my event')
-# def handle_my_custom_event(json):
-#     emit('my response', json)
-
-# @ socketio.on('my event')
-# def handle_my_custom_event(json):
-#     emit('my response', json)
 
 @ app.route('/addrec', methods=['POST', 'GET'])
 def addrec():
@@ -169,19 +155,23 @@ def list():
 
 ####################################################
 
-max_ore_size = 350;
+max_ore_size = 350
+
 
 def calc_mm_in_px(width_image, band_width, sm_in_band_width):
     mm_in_px = width_image*sm_in_band_width/band_width
     return mm_in_px/width_image
+
+
 band_width = [0.08*image_width, 0.72*image_width]
-mm_in_px = calc_mm_in_px(image_width, band_width[1]-band_width[0], 160)    
+mm_in_px = calc_mm_in_px(image_width, band_width[1]-band_width[0], 160)
+
 
 def calc_stat(object_width, object_height):
-    
+
     # for item in img_arr:
-    biggest_size_width = None;
-    biggest_size_height = None; 
+    biggest_size_width = None
+    biggest_size_height = None
     if object_width > object_height:
         biggest_size_width = object_width
     else:
@@ -210,7 +200,6 @@ def calc_stat(object_width, object_height):
     return None
 
 
-
 @ app.route('/get-image')
 def predict_model():
     with torch.no_grad():
@@ -236,28 +225,29 @@ def predict_model():
             for class_name in opt['classes']:
                 classes.append(opt['classes'].index(class_name))
 
-        pred = non_max_suppression(predict, opt['conf-thres'], opt['iou-thres'], classes= classes, agnostic= False)
-        #print(pred)
-        result_dict={1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 10:0}
+        pred = non_max_suppression(
+            predict, opt['conf-thres'], opt['iou-thres'], classes=classes, agnostic=False)
+        # print(pred)
+        result_dict = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 10: 0}
         for i, det in enumerate(pred):
             s = ''
             s += '%gx%g ' % img.shape[2:]  # print string
 
             if len(det):
-                det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
+                det[:, :4] = scale_coords(
+                    img.shape[2:], det[:, :4], img0.shape).round()
 
             for *xyxy, conf, cls in reversed(det):
                 label = f'{names[int(cls)]} {conf:.2f}'
-                plot_one_box(xyxy, img0, label=label, color=colors[int(cls)], line_thickness=3)
+                plot_one_box(xyxy, img0, label=label,
+                             color=colors[int(cls)], line_thickness=3)
                 result_dict[
                     calc_stat(
-                        float(xyxy[2]) - float(xyxy[0]), 
+                        float(xyxy[2]) - float(xyxy[0]),
                         float(xyxy[3]) + float(xyxy[1])
-                        )
+                    )
                 ] += 1
         print(result_dict)
-                
-
 
     retval, buffer = cv2.imencode('.jpg', img0)
     jpg_as_text = base64.b64encode(buffer)
