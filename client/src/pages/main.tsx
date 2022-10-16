@@ -7,26 +7,21 @@ import Circular from '../charts/Circular';
 import MaxSize from '../charts/MaxSize';
 import ChartOne from '../charts/ChartOne';
 import axios from 'axios';
+import { useAppDispatch, useAppSelector } from '../hooks/hooks';
+import { fetchData } from '../store/dataSlice/dataSlice';
+import { LoadingStatuses } from '../types/loadingStatuses';
 
-const Main = () => {
+const Main: React.FC = () => {
   // Для сокетов если хоть кто-то сделает их на бэке блин
   // const [analysis, setAnalysis] = useState([]);
   // const [maxSize, setMaxSize] = useState([]);
-  const [propertyes, setPropertyes] = useState();
-  const [img, setImg] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const dispatch = useAppDispatch();
+  const { image, propertyes, status } = useAppSelector((state) => state.data);
+
 
   useEffect(() => {
-    setIsLoading(true);
-    axios
-      .get('http://127.0.0.1:5000/get-image')
-      .then((response) => {
-        setIsLoading(false);
-
-        setPropertyes(Object.values(response.data.propertyes));
-        setImg(response.data.image);
-      })
-      .catch((error) => {});
+    dispatch(fetchData())
   }, []);
 
   // useEffect(() => {
@@ -45,30 +40,40 @@ const Main = () => {
     <>
       <div className="m-1 d-flex">
         <div className="col-6 content_info">
-          {isLoading ? (
+          {status === LoadingStatuses.PENDING ? (
             <div className="spinner-border" role="status">
               <span className="sr-only"></span>
             </div>
-          ) : (
-            <>
-              <Video data={img} />
-              <MaxSize data={propertyes} />
-            </>
-          )}
+          ) : status === LoadingStatuses.REJECTED ?
+            (
+              <div className="alert alert-danger" role="alert">
+                Ошибка загрузки
+              </div>) : (
+              <>
+                <Video data={image} />
+                <MaxSize data={propertyes} />
+              </>
+            )}
         </div>
 
         <div className="d-flex ms-3 col content_info">
           <div className="d-block col">
-            {isLoading ? (
+            {status === LoadingStatuses.PENDING ? (
               <div className="spinner-border" role="status">
                 <span className="sr-only"></span>
               </div>
-            ) : (
-              <>
-                <Analysis propertyes={propertyes} />
-                <Circular propertyes={propertyes} />
-              </>
-            )}
+            ) : status === LoadingStatuses.REJECTED ?
+              (
+                <div className="alert alert-danger" role="alert">
+                  Ошибка загрузки
+                </div>
+              )
+              : (
+                <>
+                  <Analysis propertyes={propertyes} />
+                  <Circular propertyes={propertyes} />
+                </>
+              )}
           </div>
         </div>
       </div>
